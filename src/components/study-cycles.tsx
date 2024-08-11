@@ -89,7 +89,7 @@ export function StudyCycles() {
 
   return (
     <div className="max-w-7xl p-4 mx-auto w-full space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 md:gap-0 md:flex-row md:items-center md:justify-between">
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="flex items-center gap-1 w-fit">
@@ -117,8 +117,8 @@ export function StudyCycles() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-20"></TableHead>
-                  <TableHead className="w-64">Matéria</TableHead>
+                  <TableHead className="w-10 md:w-20"></TableHead>
+                  <TableHead className="w-32 md:w-64">Matéria</TableHead>
                   <TableHead>Horas</TableHead>
                 </TableRow>
               </TableHeader>
@@ -135,7 +135,7 @@ export function StudyCycles() {
                     </TableCell>
                     <TableCell>{subject.subject}</TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap items-center gap-1.5">
+                      <div className="flex flex-wrap items-center gap-3 md:gap-1.5">
                         {Array(calculateHourBySubject(subject))
                           .fill(0)
                           .map((_, hourIndex) => (
