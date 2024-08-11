@@ -13,10 +13,11 @@ import {
   TableRow,
 } from './ui/table'
 import { Dialog, DialogTrigger } from './ui/dialog'
-import { Button } from './ui/button'
+import { Button, buttonVariants } from './ui/button'
 import { Plus, Trash } from 'lucide-react'
 import { Checkbox } from './ui/checkbox'
 import { useLocalStorage } from '@/hooks/use-local-storage'
+import Link from 'next/link'
 
 type Subject = {
   subject: string
@@ -32,7 +33,7 @@ const SUBJECT_LEVEL: Record<Subject['level'], number> = {
   great: 1,
 } as const
 
-export function StudyCycleTable() {
+export function StudyCycles() {
   const [subjects, setSubjects] = useLocalStorage<Subject[]>('subjects', [])
 
   const [isOpen, setIsOpen] = useState(false)
@@ -88,18 +89,31 @@ export function StudyCycleTable() {
 
   return (
     <div className="max-w-7xl p-4 mx-auto w-full space-y-6">
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <Button size="sm" className="flex items-center gap-1">
-            <Plus className="size-4" />
-            Adicionar matéria
-          </Button>
-        </DialogTrigger>
-        <DialogAddSubject onAddSubject={handleAddSubject} />
-      </Dialog>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="flex items-center gap-1 w-fit">
+              <Plus className="size-4" />
+              Adicionar matéria
+            </Button>
+          </DialogTrigger>
+          <DialogAddSubject onAddSubject={handleAddSubject} />
+        </Dialog>
+
+        <Link
+          href="https://youtu.be/AjU0UmGHm2Q?si=l1K9mtCUKjMuaKk5"
+          target="_blank"
+          className={buttonVariants({ variant: 'link' })}
+        >
+          <span className="hidden md:block">
+            COMO MONTAR UMA ROTINA FLEXÍVEL | CICLO DE ESTUDOS
+          </span>
+          <span className="block md:hidden">CICLO DE ESTUDOS</span>
+        </Link>
+      </div>
       <div className="grid gap-6 md:grid-cols-9">
         <div className="order-2 md:order-1 md:col-span-6">
-          <div className="rounded border">
+          <div className="rounded-base shadow-light dark:shadow-dark text-black">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -113,9 +127,7 @@ export function StudyCycleTable() {
                   <TableRow key={index}>
                     <TableCell>
                       <Button
-                        size="icon"
-                        variant="ghost"
-                        className="p-0"
+                        size="sm"
                         onClick={() => handleDeleteSubject(index)}
                       >
                         <Trash className="size-4" />
@@ -143,12 +155,20 @@ export function StudyCycleTable() {
                     </TableCell>
                   </TableRow>
                 ))}
+
+                {subjects.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center">
+                      Nenhuma matéria adicionada
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
         </div>
         <div className="order-1 md:order-2 md:col-span-3">
-          <div className="rounded-md border p-4">
+          <div className="rounded-base shadow-light dark:shadow-dark border-2 border-border dark:border-darkBorder bg-main text-black p-4">
             <FormWorkload
               daysPerWeek={daysPerWeek}
               hoursPerDay={hoursPerDay}

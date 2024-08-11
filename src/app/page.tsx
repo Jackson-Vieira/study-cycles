@@ -1,5 +1,5 @@
-import { StudyCycleTable } from '@/components/study-cycle-table'
+import { StudyCycles } from '@/components/study-cycles'
 
 export default function Home() {
-  return <StudyCycleTable />
+  return <StudyCycles />
 }

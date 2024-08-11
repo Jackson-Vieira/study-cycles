@@ -19,10 +19,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={cn(
-          inter.className,
-          'bg-background antialiased min-h-svh flex flex-col',
-        )}
+        className={cn(inter.className, 'antialiased min-h-svh flex flex-col')}
       >
         {children}
       </body>
