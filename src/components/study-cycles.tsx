@@ -18,6 +18,7 @@ import { Plus, Trash } from 'lucide-react'
 import { Checkbox } from './ui/checkbox'
 import Link from 'next/link'
 import { useLocalStorage } from '@uidotdev/usehooks'
+import { EditableText } from './editable-text'
 
 type Subject = {
   subject: string
@@ -87,6 +88,17 @@ export function StudyCycles() {
     [setSubjects],
   )
 
+  const handleSubjectChange = useCallback(
+    (index: number, value: string) => {
+      setSubjects((prev) =>
+        prev.map((subject, i) =>
+          i === index ? { ...subject, subject: value } : subject,
+        ),
+      )
+    },
+    [setSubjects],
+  )
+
   return (
     <div className="max-w-7xl p-4 mx-auto w-full space-y-6">
       <div className="flex flex-col gap-4 md:gap-0 md:flex-row md:items-center md:justify-between">
@@ -133,7 +145,12 @@ export function StudyCycles() {
                         <Trash className="size-4" />
                       </Button>
                     </TableCell>
-                    <TableCell>{subject.subject}</TableCell>
+                    <TableCell>
+                      <EditableText
+                        value={subject.subject}
+                        onChange={(value) => handleSubjectChange(index, value)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap items-center gap-3 md:gap-1.5">
                         {Array(calculateHourBySubject(subject))
