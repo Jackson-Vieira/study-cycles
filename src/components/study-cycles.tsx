@@ -1,7 +1,7 @@
 'use client'
 
 import { DialogAddSubject } from '@/components/dialog-add-subject'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { FormWorkload } from './form-workload'
 import { useWorkload } from '@/hooks/use-workload'
 import {
@@ -42,18 +42,22 @@ export function StudyCycles() {
   const { daysPerWeek, hoursPerDay, setDaysPerWeek, setHoursPerDay } =
     useWorkload()
 
-  const calculateHourBySubject = ({ level }: Subject) => {
-    const totalHours = daysPerWeek * hoursPerDay
+  const calculateHourBySubject = useMemo(
+    () =>
+      ({ level }: Subject) => {
+        const totalHours = daysPerWeek * hoursPerDay
 
-    const totalWeight = subjects.reduce(
-      (acc, subject) => acc + SUBJECT_LEVEL[subject.level],
-      0,
-    )
+        const totalWeight = subjects.reduce(
+          (acc, subject) => acc + SUBJECT_LEVEL[subject.level],
+          0,
+        )
 
-    const weight = totalHours / totalWeight
+        const weight = totalHours / totalWeight
 
-    return Math.max(2, Math.round(weight * SUBJECT_LEVEL[level]))
-  }
+        return Math.max(2, Math.round(weight * SUBJECT_LEVEL[level]))
+      },
+    [subjects, daysPerWeek, hoursPerDay],
+  )
 
   const handleAddSubject = useCallback(
     (subject: Omit<Subject, 'checkedHours'>) => {
@@ -146,10 +150,19 @@ export function StudyCycles() {
                       </Button>
                     </TableCell>
                     <TableCell>
-                      <EditableText
-                        value={subject.subject}
-                        onChange={(value) => handleSubjectChange(index, value)}
-                      />
+                      <div className="flex items-center gap-1.5">
+                        <EditableText
+                          value={subject.subject}
+                          onChange={(value) =>
+                            handleSubjectChange(index, value)
+                          }
+                        />
+
+                        <strong>
+                          ({subject.checkedHours}/
+                          {calculateHourBySubject(subject)})
+                        </strong>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap items-center gap-3 md:gap-1.5">
