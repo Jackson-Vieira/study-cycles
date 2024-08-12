@@ -1,4 +1,4 @@
-import { useLocalStorage } from './use-local-storage'
+import { useLocalStorage } from '@uidotdev/usehooks'
 
 export const useWorkload = () => {
   const [hoursPerDay, setHoursPerDay] = useLocalStorage('hoursPerDay', 4)

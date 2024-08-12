@@ -16,8 +16,8 @@ import { Dialog, DialogTrigger } from './ui/dialog'
 import { Button, buttonVariants } from './ui/button'
 import { Plus, Trash } from 'lucide-react'
 import { Checkbox } from './ui/checkbox'
-import { useLocalStorage } from '@/hooks/use-local-storage'
 import Link from 'next/link'
+import { useLocalStorage } from '@uidotdev/usehooks'
 
 type Subject = {
   subject: string
