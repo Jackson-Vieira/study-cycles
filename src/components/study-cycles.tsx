@@ -45,13 +45,20 @@ export function StudyCycles() {
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const { daysPerWeek, hoursPerDay, setDaysPerWeek, setHoursPerDay } =
-    useWorkload()
+  const {
+    daysPerWeek,
+    hoursPerDay,
+    setDaysPerWeek,
+    setHoursPerDay,
+    cycleDurationInMinutes,
+    setCycleDuration,
+  } = useWorkload()
 
   const calculateHourBySubject = useMemo(
     () =>
       ({ level }: Subject) => {
-        const totalHours = daysPerWeek * hoursPerDay
+        const totalHours =
+          daysPerWeek * ((hoursPerDay * 60) / cycleDurationInMinutes)
 
         const totalWeight = subjects.reduce(
           (acc, subject) => acc + SUBJECT_LEVEL[subject.level],
@@ -62,7 +69,7 @@ export function StudyCycles() {
 
         return Math.max(2, Math.round(weight * SUBJECT_LEVEL[level]))
       },
-    [subjects, daysPerWeek, hoursPerDay],
+    [subjects, daysPerWeek, hoursPerDay, cycleDurationInMinutes],
   )
 
   const handleAddSubject = useCallback(
@@ -220,8 +227,10 @@ export function StudyCycles() {
               <FormWorkload
                 daysPerWeek={daysPerWeek}
                 hoursPerDay={hoursPerDay}
+                cycleDurationInMinutes={cycleDurationInMinutes}
                 onDaysPerWeekChange={setDaysPerWeek}
                 onHoursPerDayChange={setHoursPerDay}
+                onCycleDurationChange={setCycleDuration}
               />
             </div>
           </div>
