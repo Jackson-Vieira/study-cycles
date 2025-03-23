@@ -155,7 +155,7 @@ export function FormWorkload({
         </div>
       </div>
       <div className="space-y-2">
-        <Label>Duração do ciclo (minutos)</Label>
+        <Label>Duração mínima do ciclo (minutos)</Label>
 
         <div className="flex items-center gap-3">
           <Input
@@ -170,7 +170,7 @@ export function FormWorkload({
               size="sm"
               variant="noShadow"
               onClick={() => {
-                const MINIMUM_CYCLE_DURATION_IN_MINUTES = 1
+                const MINIMUM_CYCLE_DURATION_IN_MINUTES = 60
 
                 if (
                   cycleDurationInMinutes > MINIMUM_CYCLE_DURATION_IN_MINUTES

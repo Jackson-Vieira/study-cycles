@@ -72,13 +72,13 @@ export function StudyCycles() {
     [subjects, daysPerWeek, hoursPerDay, cycleDurationInMinutes],
   )
 
-  const handleAddSubject = useCallback(
-    (subject: Omit<Subject, 'checkedHours'>) => {
-      setSubjects((prev) => [...prev, { ...subject, checkedHours: 0 }])
-      setIsOpen(false)
-    },
-    [setSubjects],
-  )
+  const handleAddSubject = useCallback(() => {
+    const subject: Omit<Subject, 'checkedHours'> = {
+      subject: 'Nome da Máteria',
+      level: 'great',
+    }
+    setSubjects((prev) => [...prev, { ...subject, checkedHours: 0 }])
+  }, [setSubjects])
 
   const handleDeleteSubject = useCallback(
     (index: number) => {
@@ -131,16 +131,6 @@ export function StudyCycles() {
     <>
       <div className="max-w-7xl p-4 mx-auto w-full space-y-6">
         <div className="flex flex-col gap-4 md:gap-0 md:flex-row md:items-center md:justify-between">
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="flex items-center gap-1 w-fit">
-                <Plus className="size-4" />
-                Adicionar matéria
-              </Button>
-            </DialogTrigger>
-            <DialogAddSubject onAddSubject={handleAddSubject} />
-          </Dialog>
-
           <Link
             href="https://youtu.be/AjU0UmGHm2Q?si=l1K9mtCUKjMuaKk5"
             target="_blank"
@@ -153,12 +143,11 @@ export function StudyCycles() {
           </Link>
         </div>
         <div className="grid gap-6 md:grid-cols-9">
-          <div className="order-2 md:order-1 md:col-span-6">
+          <div className="order-2 md:order-1 md:col-span-6 space-y-4">
             <div className="rounded-base shadow-light dark:shadow-dark text-black">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-10 md:w-20"></TableHead>
                     <TableHead className="w-32 md:w-64">Matéria</TableHead>
                     <TableHead>Horas</TableHead>
                   </TableRow>
@@ -167,14 +156,6 @@ export function StudyCycles() {
                   {subjects.map((subject, index) => (
                     <TableRow key={index}>
                       <TableCell>
-                        <Button
-                          size="sm"
-                          onClick={() => handleDeleteSubject(index)}
-                        >
-                          <Trash className="size-4" />
-                        </Button>
-                      </TableCell>
-                      <TableCell>
                         <div className="flex items-center gap-1.5">
                           <EditableText
                             value={subject.subject}
@@ -182,7 +163,6 @@ export function StudyCycles() {
                               handleSubjectChange(index, value)
                             }
                           />
-
                           <strong>
                             ({subject.checkedHours}/
                             {calculateHourBySubject(subject)})
@@ -221,6 +201,14 @@ export function StudyCycles() {
                 </TableBody>
               </Table>
             </div>
+            <Button
+              size="sm"
+              className="flex items-center gap-1 w-fit mx-auto"
+              onClick={handleAddSubject}
+            >
+              <Plus className="size-4" />
+              Adicionar matéria
+            </Button>
           </div>
           <div className="order-1 md:order-2 md:col-span-3">
             <div className="rounded-base shadow-light dark:shadow-dark border-2 border-border dark:border-darkBorder bg-main text-black p-4">
