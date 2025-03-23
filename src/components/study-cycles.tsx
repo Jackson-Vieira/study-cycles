@@ -1,6 +1,5 @@
 'use client'
 
-import { DialogAddSubject } from '@/components/dialog-add-subject'
 import { useCallback, useMemo, useState } from 'react'
 import { FormWorkload } from './form-workload'
 import { useWorkload } from '@/hooks/use-workload'
