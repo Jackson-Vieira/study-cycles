@@ -11,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from './ui/table'
-import { Dialog, DialogTrigger } from './ui/dialog'
 import { Button, buttonVariants } from './ui/button'
 import { Plus, Trash } from 'lucide-react'
 import { Checkbox } from './ui/checkbox'
@@ -19,8 +18,17 @@ import Link from 'next/link'
 import { useLocalStorage, useWindowSize } from '@uidotdev/usehooks'
 import { EditableText } from './editable-text'
 import Confetti from 'react-confetti'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
+import { ModeToggle } from './toggler-theme'
 
 type Subject = {
+  id: string
   subject: string
   level: 'terrible' | 'bad' | 'more-or-less' | 'good' | 'great'
   checkedHours: number
@@ -34,6 +42,14 @@ const SUBJECT_LEVEL: Record<Subject['level'], number> = {
   great: 1,
 } as const
 
+const SUBJECT_LEVEL_LABELS: Record<Subject['level'], string> = {
+  terrible: '😖 Péssimo',
+  bad: '😕 Ruim',
+  'more-or-less': '😐 Mais ou menos',
+  good: '🙂 Bom',
+  great: '😄 Ótimo',
+} as const
+
 export function StudyCycles() {
   const [subjects, setSubjects] = useLocalStorage<Subject[]>('subjects', [])
 
@@ -42,22 +58,17 @@ export function StudyCycles() {
   const { width, height } = useWindowSize()
   const isDimensionsReady = width && height
 
-  const [isOpen, setIsOpen] = useState(false)
-
   const {
     daysPerWeek,
     hoursPerDay,
     setDaysPerWeek,
-    setHoursPerDay,
-    cycleDurationInMinutes,
-    setCycleDuration,
+    setHoursPerDay
   } = useWorkload()
 
   const calculateHourBySubject = useMemo(
     () =>
       ({ level }: Subject) => {
-        const totalHours =
-          daysPerWeek * ((hoursPerDay * 60) / cycleDurationInMinutes)
+        const totalHours = daysPerWeek * hoursPerDay
 
         const totalWeight = subjects.reduce(
           (acc, subject) => acc + SUBJECT_LEVEL[subject.level],
@@ -66,13 +77,16 @@ export function StudyCycles() {
 
         const weight = totalHours / totalWeight
 
-        return Math.max(2, Math.round(weight * SUBJECT_LEVEL[level]))
+        const subjectLevelWeight = SUBJECT_LEVEL[level] * weight
+
+        return Math.max(2, Math.round(subjectLevelWeight))
       },
-    [subjects, daysPerWeek, hoursPerDay, cycleDurationInMinutes],
+    [subjects, daysPerWeek, hoursPerDay]
   )
 
   const handleAddSubject = useCallback(() => {
     const subject: Omit<Subject, 'checkedHours'> = {
+      id: crypto.randomUUID(),
       subject: 'Nome da Máteria',
       level: 'great',
     }
@@ -126,6 +140,17 @@ export function StudyCycles() {
     [setSubjects],
   )
 
+  const handleLevelChange = useCallback(
+    (index: number, level: Subject['level']) => {
+      setSubjects((prev) =>
+        prev.map((subject, i) =>
+          i === index ? { ...subject, level } : subject,
+        ),
+      )
+    },
+    [setSubjects],
+  )
+
   return (
     <>
       <div className="max-w-7xl p-4 mx-auto w-full space-y-6">
@@ -140,6 +165,8 @@ export function StudyCycles() {
             </span>
             <span className="block md:hidden">CICLO DE ESTUDOS</span>
           </Link>
+
+          <ModeToggle />
         </div>
         <div className="grid gap-6 md:grid-cols-9">
           <div className="order-2 md:order-1 md:col-span-6 space-y-4">
@@ -148,12 +175,14 @@ export function StudyCycles() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-32 md:w-64">Matéria</TableHead>
+                    <TableHead className="w-32">Nível</TableHead>
                     <TableHead>Horas</TableHead>
+                    <TableHead className="w-24" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {subjects.map((subject, index) => (
-                    <TableRow key={index}>
+                    <TableRow key={subject.id}>
                       <TableCell>
                         <div className="flex items-center gap-1.5">
                           <EditableText
@@ -169,12 +198,33 @@ export function StudyCycles() {
                         </div>
                       </TableCell>
                       <TableCell>
+                        <Select
+                          value={subject.level}
+                          onValueChange={(value) => 
+                            handleLevelChange(index, value as Subject['level'])
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Selecione o nível" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.entries(SUBJECT_LEVEL_LABELS).map(([value, label]) => (
+                              <SelectItem key={value} value={value}>
+                                <span className="flex items-center gap-1 text-xs">
+                                  {label}
+                                </span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
                         <div className="flex flex-wrap items-center gap-3 md:gap-1.5">
                           {Array(calculateHourBySubject(subject))
                             .fill(0)
                             .map((_, hourIndex) => (
                               <Checkbox
-                                key={hourIndex}
+                                key={`${subject.subject}-${hourIndex}`}
                                 checked={hourIndex < subject.checkedHours}
                                 onCheckedChange={(isChecked) =>
                                   handleCheckboxChange(
@@ -186,6 +236,15 @@ export function StudyCycles() {
                               />
                             ))}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="noShadow"
+                          size="icon"
+                          onClick={() => handleDeleteSubject(index)}
+                        >
+                          <Trash className="size-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -214,10 +273,8 @@ export function StudyCycles() {
               <FormWorkload
                 daysPerWeek={daysPerWeek}
                 hoursPerDay={hoursPerDay}
-                cycleDurationInMinutes={cycleDurationInMinutes}
                 onDaysPerWeekChange={setDaysPerWeek}
                 onHoursPerDayChange={setHoursPerDay}
-                onCycleDurationChange={setCycleDuration}
               />
             </div>
           </div>

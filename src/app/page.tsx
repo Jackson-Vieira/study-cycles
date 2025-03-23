@@ -1,7 +1,7 @@
 'use client'
 
 import { StudyCyclesSkeleton } from '@/components/skeletons/study-cycles-skeleton'
-import { StudyCycles } from '@/components/study-cycles'
+import { StudyCycles } from '@/components/modeToggle'
 import { useIsClient } from '@uidotdev/usehooks'
 
 export default function Home() {

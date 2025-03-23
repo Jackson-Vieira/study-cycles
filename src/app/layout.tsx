@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/lib/utils'
 import { GithubCorner } from '@/components/github-corner'
+import { ThemeProvider } from '@/components/theme-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,12 +20,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body
-        className={cn(inter.className, 'antialiased min-h-svh flex flex-col')}
-      >
-        <GithubCorner />
-        {children}
-      </body>
+        <body
+              className={cn(inter.className, 'antialiased min-h-svh flex flex-col')}
+        >
+          <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+          >
+            <GithubCorner />
+            {children}
+          </ThemeProvider>
+        </body>
     </html>
   )
 }
